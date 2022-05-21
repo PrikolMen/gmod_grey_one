@@ -17,14 +17,13 @@ cvars.AddChangeCallback("gray_one_damage_min", function( name, old, new )
 	minimal_damage = tonumber( new )
 end, addon_name)
 
+local achievements = {}
+
 do
 
-    local net_WriteVector = net.WriteVector
     local timer_Simple = timer.Simple
     local math_random = math.random
     local math_Rand = math.Rand
-    local net_Start = net.Start
-    local net_Send = net.Send
     local IsValid = IsValid
     local Vector = Vector
 
@@ -43,9 +42,20 @@ do
                 function ent:Use( ply )
                     if not (damage) then return end
                     if IsValid( ply ) and ply:IsPlayer() then
-                        net_Start( addon_name )
-                            net_WriteVector( self:GetBallColor() )
-                        net_Send( ply )
+                        net.Start( addon_name )
+                            net.WriteBool( false )
+                            net.WriteVector( self:GetBallColor() )
+                        net.Send( ply )
+
+                        timer.Simple(0, function()
+                            if IsValid( ply ) and (achievements[ ply:SteamID64() ] == nil) then
+                                achievements[ ply:SteamID64() ] = true
+                                net.Start( addon_name )
+                                    net.WriteBool( true )
+                                    net.WriteEntity( ply )
+                                net.Broadcast()
+                            end
+                        end)
 
                         ply:TakeDamage( math_random( minimal_damage, ( ply:GetMaxHealth() - ply:Health() ) * 0.25 ), self )
                     end
