@@ -5,8 +5,6 @@ language.Add( addon_name, "Finally! A Grey One!" )
 
 do
 
-	local DrawColorModify = DrawColorModify
-
 	net.Receive(addon_name, function()
 		if net.ReadBool() then
 
@@ -26,6 +24,7 @@ do
 			}
 
 			local timeout = 0
+			local DrawColorModify = DrawColorModify
 			hook.Add("RenderScreenspaceEffects", addon_name, function()
 				if ply:Alive() then
 					DrawColorModify(colorModify)
